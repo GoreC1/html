@@ -1,27 +1,72 @@
 <?php
+$lines = file("../NEWBASE.txt");
 
-$fileContent = file_get_contents('/var/www/html/stats.txt');
-$counters = json_decode($fileContent, true);
+$oldest = date("Y/m/d");
+$yongest = date("Y/m/d", strtotime("1800-01-01"));
+$mailServers = array();
+$phoneOldest = "";
+$mailOldest = "";
+$phoneYongest = "";
+$mailYongest = "";
 
-$CTR = [];
-$CTI = [];
-$CTB = [];
+foreach ($lines as $line) {
+    $line = explode(";", $line);
+    $lineCount = count($line);
 
-for ($i = 1; $i <= 5; $i++) {
-  $CTR[$i] = round($counters["Page$i"]["FromBannerVisitorsCount"] / $counters["Page$i"]["BannerSeenCount"], 2) * 100;
-  $CTI[$i] = round($counters["Page$i"]["FromBannerVisitorsCount"]/ ($counters["Page$i"]["AllVisitorsCount"] ?? 0), 3);
-  $CTB[$i] = round($counters["Page$i"]["SumbitVisitorsCount"] / $counters["Page$i"]["AllVisitorsCount"], 3);
+    if ($lineCount < 8) {
+        continue;
+    }
+
+    $mail = $line[7];
+    $mailServer = explode(".",explode("@", $mail)[1])[0];
+    echo "$mailServer";
+
+    if (!$mailServers[$mailServer]){
+        $mailServers[$mailServer] = 1;
+    }
+    else{
+        $mailServers[$mailServer]++;
+    }
+
+    if ($lineCount < 10) {
+        continue;
+    }
+
+    $age = str_replace('.', '/', $line[9]);
+
+    if ($age > $yongest) {
+        $yongest = $age;
+        $phoneYongest = $line[8];
+        $mailYongest = $mail;
+    }
+
+    if ($age < $oldest){
+        $oldest = $age;
+        $phoneOldest = $line[8];
+        $mailOldest = $mail;
+    }
+
 }
 ?>
-
-<link rel='stylesheet' href='styles.css'>
-<div class="links">
-  <a href="./random.php">Рандомные баннера</a>
+<div>
+   <?php echo "Oldest man/woman born in $oldest his/her phone $phoneOldest his/her email $mailOldest"; ?>
+</div>
+    
+<div>
+    <?php echo "Yongest man/woman born in $yongest his/her phone $phoneYongest his/her email $mailYongest";?>
 </div>
 
-<?php for ($i = 1; $i <= 5; $i++) { ?>
-  <div> CTR <?php echo $i ?>: <?php echo $CTR[$i] ?>%</div>
-  <div> CTI <?php echo $i ?>: <?php echo $CTI[$i] ?></div>
-  <div> CTB <?php echo $i ?>: <?php echo $CTB[$i] ?></div>
-  <hr>
-<?php } ?>
+<?php
+foreach ($mailServers as $key => $value) {
+    ?>
+    <div>
+        <?php
+        if ($key == ""){
+            continue;   
+        }
+        echo "$key uses $value people";
+        ?>
+    </div>
+    <?php
+}
+?>

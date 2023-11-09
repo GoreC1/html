@@ -1,0 +1,12 @@
+.resident{
+  display: flex;
+  gap: 5px;
+
+  .blue {
+    color: blue;
+  }
+
+  .pink {
+    color: pink;
+  }
+}
