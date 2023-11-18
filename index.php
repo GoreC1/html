@@ -12,15 +12,13 @@ $operators = array_unique($operators);
 ?>
 <script>
   function getCities(operator) {
-    const operator = operator;
-
     if (operator) {
       var xmlhttp = new XMLHttpRequest();
       xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
           document.getElementById("city").disabled = false;
           document.getElementById("city").innerHTML = this.responseText;
-          calculate();
+          getCost();
         }
       };
       xmlhttp.open("GET", "./pages/getCities.php?operator=" + operator, true);
@@ -56,12 +54,12 @@ $operators = array_unique($operators);
   </select>
 
   <label for="city">Город:</label>
-  <select id="city" disabled onchange="calculate()">
+  <select id="city" disabled onchange="getCost()">
     <option value="" selected disabled hidden>выберите</option>
   </select>
 
   <label for="time">Время разговора в роуминге (в минутах):</label>
-  <input type="number" id="time" min="0" onchange="calculate()">
+  <input type="number" id="time" min="0" onchange="getCost()">
 
   <label for="cost">Стоимость:</label>
   <input disabled id="cost">
